@@ -18,7 +18,7 @@ onMounted(() => {
 const router = useRouter();
 const username = ref("");
 
-useSocket().init();
+useSocket();
 
 function enterLobby() {
   if (username.value.trim()) {

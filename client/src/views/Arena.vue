@@ -61,7 +61,7 @@ useSocket().onMessage("new", (data: string) => {
 
 useSocket().onMessage("countdown", (time: number | string) => {
   lobbyState.value = "countdown";
-  remainingTime.value = time;
+  remainingTime.value = time as number;
   if (typeof time !== "number") {
     duel.play()
   }
