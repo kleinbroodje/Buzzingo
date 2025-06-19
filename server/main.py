@@ -40,6 +40,7 @@ def get_active_usernames():
 @socketio.on("connect")
 def handle_connect():
     players[request.sid] = Player()
+    socketio.emit("player_list", get_active_usernames())
     print(f"player count: {len(players)}")
 
 
