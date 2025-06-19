@@ -74,15 +74,18 @@ def start_countdown():
             time.sleep(1)
         socketio.emit("countdown", "It's time to d-d-d-d-d-d-d-d-d-d-duel!")
         countdown_active = False
+        time.sleep(5.5)
+        gen_new_word()
 
     if not countdown_active:
         Thread(target=start).start()
         countdown_active = True
 
 
-# random_word = random.choice(words)["english"]
-# print(f"new word: {random_word}")
-# socketio.emit("new", f"{random_word}")
+def gen_new_word():
+    random_word = choice(words)["english"]
+    print(f"new word: {random_word}")
+    socketio.emit("new_word", f"{random_word}")
 
 
 # main

@@ -55,7 +55,10 @@ function onClick() {
   buzzer.play();
 }
 
-useSocket().onMessage("new", (data: string) => {
+useSocket().onMessage("new_word", (data: string) => {
+  if (lobbyState.value !== "word") {
+      lobbyState.value = "word";
+  }
   currentWord.value = data;
 });
 
