@@ -5,18 +5,14 @@ let socket: Socket | null = null;
 
 export function useSocket() {
   if (!socket) {
-    socket = io("http://localhost:3000");
+    socket = io("http://localhost:5000");
   }
 
-  const connected = ref(false);
-
   socket.on("connect", () => {
-    connected.value = true;
     console.log("Socket connected:", socket?.id);
   });
 
   socket.on("disconnect", () => {
-    connected.value = false;
     console.log("Socket disconnected");
   });
 
@@ -28,5 +24,5 @@ export function useSocket() {
     socket?.on(event, callback);
   }
 
-  return { connected, sendMessage, onMessage, socket };
+  return { sendMessage, onMessage, socket };
 }

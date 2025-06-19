@@ -9,17 +9,18 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { io } from "socket.io-client";
+import { useSocket} from "../composables/useSocket";
 
 const router = useRouter();
-const socket = io("http://localhost:5000");
-
 const username = ref("");
+
+useSocket()
 
 function enterLobby() {
   if (username.value.trim()) {
     // localStorage.setItem('username', username.value);
     router.push("/arena");
+    useSocket().sendMessage("set_username", username.value);
   }
 }
 </script>
