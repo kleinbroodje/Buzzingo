@@ -1,10 +1,8 @@
 <template>
-  <div class="arena">
-    <div class="text">
-      <h1>{{ currentWord }}</h1>
-    </div>
-    <button @click="onClick" class="buzzer"/>
+  <div class="text">
+    <h1>{{ currentWord }}</h1>
   </div>
+  <button @click="onClick" class="buzzer"/>
 </template>
 
 <script setup lang="ts">
@@ -45,8 +43,11 @@ h1 {
   border-radius: 50%;
   cursor: pointer;
   border: none;
-  transform: translate(-50%, -50%);
-  top: 50%;
+  margin:auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 
   &:hover
   {
@@ -68,12 +69,5 @@ h1 {
   left: 50%;
   transform: translateX(-50%);
   top: 15%;
-  width: 100px;
-}
-
-.arena {
-  position: relative;
-  height: 100%;
-  width: 100%;
 }
 </style>

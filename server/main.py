@@ -31,17 +31,17 @@ def handle_connect():
 
 @socketio.on("disconnect")
 def handle_disconnect():
-    players.remove(request.sid)
+    socketio.emit("player_list", list(player.username for player in players.values()))
+    del players[request.sid]
     print(f"{request.sid} disconnected")
     print(f"player count: {len(players)}")
-    # socketio.emit("player_list", json.dumps(list(players.values())))
 
 
 @socketio.event
 def set_username(usr):
     players[request.sid].username = usr
     print(f"username: {usr}")
-    # socketio.emit("player_list", json.dumpslist(players.values()))
+    socketio.emit("player_list", list(player.username for player in players.values()))
 
     random_word = words[randint(0, len(words) - 1)]["english"]
     print(f"new word: {random_word}")
