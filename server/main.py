@@ -63,6 +63,11 @@ def set_username(usr):
         start_countdown()
 
 
+@socketio.event
+def handle_buzzer(arg):
+    pass
+
+
 def start_countdown():
     global countdown_active
 

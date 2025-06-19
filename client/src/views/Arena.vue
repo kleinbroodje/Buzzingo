@@ -52,6 +52,7 @@ const countdownText = computed(() => {
 })
 
 function onClick() {
+  useSocket().sendMessage("handle_buzzer", "")
   buzzer.play();
 }
 
