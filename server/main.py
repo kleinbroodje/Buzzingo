@@ -1,9 +1,17 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, send
 import json
-from random import randint
+from random import choice
+from threading import Thread
+import time
 
 
+# flask setup
+app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+
+# business logic
 class Player:
     def __init__(self):
         self.sid = None
@@ -13,16 +21,22 @@ class Player:
         return f"Player(sid={self.sid}, username={self.username})"
 
 
-app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
-# Allow all origins for CORS, change * to URL for security
 players = {}
 
 
-with open("server/words.json") as data:
+# "database" of words
+countdown_active = False
+
+
+with open("words.json", encoding="utf8") as data:
     words = json.load(data)
 
 
+def get_active_usernames():
+    return list(player.username for player in players.values() if player.username is not None)
+
+
+# socket endpoints
 @socketio.on("connect")
 def handle_connect():
     players[request.sid] = Player()
@@ -31,8 +45,8 @@ def handle_connect():
 
 @socketio.on("disconnect")
 def handle_disconnect():
-    socketio.emit("player_list", list(player.username for player in players.values()))
     del players[request.sid]
+    socketio.emit("player_list", get_active_usernames())
     print(f"{request.sid} disconnected")
     print(f"player count: {len(players)}")
 
@@ -41,12 +55,35 @@ def handle_disconnect():
 def set_username(usr):
     players[request.sid].username = usr
     print(f"username: {usr}")
-    socketio.emit("player_list", list(player.username for player in players.values()))
+    socketio.emit("player_list", get_active_usernames())
 
-    random_word = words[randint(0, len(words) - 1)]["english"]
-    print(f"new word: {random_word}")
-    socketio.emit("new", f"{random_word}")
+    if len(get_active_usernames()) == 2:
+        # DUEL
+        start_countdown()
 
 
+def start_countdown():
+    global countdown_active
+
+    def start():
+        global countdown_active    
+        
+        for t in range(5, 0, -1):
+            socketio.emit("countdown", t)
+            time.sleep(1)
+        socketio.emit("countdown", "It's time to d-d-d-d-d-d-d-d-d-d-duel!")
+        countdown_active = False
+
+    if not countdown_active:
+        Thread(target=start).start()
+        countdown_active = True
+
+
+# random_word = random.choice(words)["english"]
+# print(f"new word: {random_word}")
+# socketio.emit("new", f"{random_word}")
+
+
+# main
 if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0", port=5000, debug=True)
