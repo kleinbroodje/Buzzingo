@@ -1,33 +1,28 @@
 <template>
-    <button id="s" class="sideBarButton" @click="toggleSideBar"><<</button>
-    <div id="playerList" class="sideBar">
-        <p v-for=" player in playerList">{{ player }}</p>
+    <button id="s" class="sideBarButton" :style="sideBarButtonStyle" @click="toggled = !toggled">{{ toggled ? ">>" : "<<" }}</button>
+    <div id="playerList" class="sideBar" :style="sideBarStyle">
+        <p v-for="player in playerList">{{ player }}</p>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useSocket} from "../composables/useSocket";
+import { ref, computed } from "vue";
+import { useSocket } from "../composables/useSocket";
 
 let playerList = ref([]);
+let toggled = ref(false);
+
+const sideBarStyle = computed(() => ({
+    width: toggled.value ? "300px" : "0px",
+}));
+const sideBarButtonStyle = computed(() => ({
+    marginRight: toggled.value ? "300px" : "0px",
+}));
 
 useSocket().onMessage("player_list", (data: any) => {
   playerList.value = data;
 });
 
-let toggled = ref(false);
-function toggleSideBar() {
-    if (!toggled.value) {
-        document.getElementById("playerList")!.style.width = "300px";
-        document.getElementById("s")!.style.marginRight = "300px";
-    }
-    else {
-        document.getElementById("playerList")!.style.width = "0";
-        document.getElementById("s")!.style.marginRight = "0";
-    }
-    toggled.value = !toggled.value;
-
-}
 </script>
 
 <style lang="scss" scoped>
