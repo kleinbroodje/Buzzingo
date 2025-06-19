@@ -2,6 +2,32 @@ import { ref } from "vue";
 import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
+const playerList = ref<string[]>([])
+const gameState = ref<string>("start");
+
+export function useState() {
+  function set(state: string) {
+    gameState.value = state;
+  }
+
+  function get() {
+    return gameState.value;
+  }
+
+  return { set, get }
+}
+
+export function usePlayerList() {
+  function set(list: Array<string>) {
+    playerList.value = list;
+  }
+
+  function get() {
+    return playerList.value;
+  }
+
+  return { set, get }
+}
 
 export function useSocket() {
   if (!socket) {

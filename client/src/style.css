@@ -13,6 +13,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@font-face {
+  font-family: Winky Sans;
+  src: url('src/assets/fonts/WinkySans-VariableFont_wght.ttf');
+}
+
+h1, h2, p, button, input {
+  font-family: "Winky Sans";
+}
+
 #app {
   text-align: center;
 }

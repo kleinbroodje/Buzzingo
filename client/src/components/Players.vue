@@ -1,16 +1,17 @@
 <template>
     <button id="s" class="sideBarButton" :style="sideBarButtonStyle" @click="toggled = !toggled">{{ toggled ? ">>" : "<<" }}</button>
     <div id="playerList" class="sideBar" :style="sideBarStyle">
-        <p v-for="player in playerList">{{ player }}</p>
+        <h2>Players:</h2>
+        <hr>
+        <p v-for="player in usePlayerList().get()">{{ player }}</p>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useSocket } from "../composables/useSocket";
+import { useSocket, usePlayerList } from "../composables/useSocket";
 
-let playerList = ref([]);
-let toggled = ref(false);
+let toggled = ref(true);
 
 const sideBarStyle = computed(() => ({
     width: toggled.value ? "300px" : "0px",
@@ -20,7 +21,7 @@ const sideBarButtonStyle = computed(() => ({
 }));
 
 useSocket().onMessage("player_list", (data: any) => {
-  playerList.value = data;
+    usePlayerList().set(data);
 });
 
 </script>
@@ -40,6 +41,24 @@ $bgcolor: #323030;
     top: 0;
     z-index: 1;
     font-size: 30px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    h2 {
+        margin: 10px;
+    }
+    
+    hr {
+        width: 100%;
+    }
+
+    p {
+        margin: 10px;
+        margin-left: 35px;
+        left: 0%;
+    }
 }
 
 .sideBarButton {

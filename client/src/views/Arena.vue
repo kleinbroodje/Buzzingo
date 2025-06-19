@@ -1,38 +1,78 @@
 <template>
   <div class="text">
-    <h1>{{ currentWord }}</h1>
+    <h1>{{ stateToText }}</h1>
   </div>
   <button @click="onClick" class="buzzer"/>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useSocket} from "../composables/useSocket";
-import buzzer from '../assets/sfx/buzzer.wav';
-const audio = new Audio(buzzer);
 
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useSocket, usePlayerList } from "../composables/useSocket";
+import buzzer_path from '../assets/sfx/buzzer.wav';
+import duel_path from '../assets/sfx/duel.mp3';
+
+const buzzer = new Audio(buzzer_path);
+const duel = new Audio(duel_path);
+duel.volume = 0.4;
+
+const router = useRouter();
+
+onMounted(() => {
+  if (sessionStorage.getItem("username") === null) {
+    router.push("/")
+  } else {
+    useSocket().sendMessage("set_username", sessionStorage.getItem("username"));
+  }
+})
+
+const lobbyState = ref("waiting");
+let remainingTime = ref(0);
 let currentWord = ref("");
 
+const stateToText = computed(() => {
+  if (lobbyState.value === "waiting") {
+    return waitingText.value;
+  } else if (lobbyState.value === "countdown") {
+    return countdownText.value;
+  } else if (lobbyState.value === "word") {
+    return currentWord.value;
+  } else {
+    return "Error";
+  }
+})
+
+const waitingText = computed(() => {
+  return `Waiting for players (${usePlayerList().get().length} / 2)`;
+})
+
+const countdownText = computed(() => {
+  return `${remainingTime.value}`;
+})
+
 function onClick() {
-    audio.play();
+  buzzer.play();
 }
 
 useSocket().onMessage("new", (data: string) => {
-    currentWord.value = data;
+  currentWord.value = data;
 });
+
+useSocket().onMessage("countdown", (time: number | string) => {
+  lobbyState.value = "countdown";
+  remainingTime.value = time;
+  if (typeof time !== "number") {
+    duel.play()
+  }
+})
 
 </script>
 
 <style lang="scss" scoped>
-@font-face {
-    font-family: Winky Sans;
-    src: url('src/assets/fonts/WinkySans-VariableFont_wght.ttf');
-}
-
 h1 {
-    font-family: 'Winky Sans';
-    font-size: 40px;
-    color: white;
+  font-size: 50px;
+  color: white;
 }
 
 .buzzer {
@@ -63,7 +103,7 @@ h1 {
 .text {
   position: absolute;
   color: white;
-  border: white 1px solid;
+  // border: white 1px solid;
   border-radius: 10px;
   padding: 20px;
   left: 50%;
